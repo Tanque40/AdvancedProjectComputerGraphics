@@ -11,9 +11,9 @@ static const struct {
 	float r, g, b;
 } vertices[ 3 ] =
 {
-	{ -0.6f, -0.4f, 0.f, 0.f, 1.f },
+	{ -0.6f, -0.4f, 1.0f, 0.f, 0.f },
 	{  0.6f, -0.4f, 0.f, 1.f, 0.f },
-	{   0.f,  0.6f, 1.f, 0.f, 0.f }
+	{   0.f,  0.6f, 0.f, 0.f, 1.f }
 };
 
 static const char* vertex_shader_text =
@@ -112,7 +112,7 @@ int main( void ) {
 		glClear( GL_COLOR_BUFFER_BIT );
 
 		glm::mat4 m( 1.0f );
-		m = glm::rotate( m, ( float ) glfwGetTime(), glm::vec3( 1.0f ) );
+		m = glm::rotate( m, ( float ) glfwGetTime(), glm::vec3( 1.f ) );
 		p = glm::ortho( -ratio, ratio, -1.f, 1.f, 1.f, -1.f );
 		mvp = p * m;
 
