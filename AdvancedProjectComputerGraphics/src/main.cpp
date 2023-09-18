@@ -6,15 +6,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static const struct {
-	float x, y;
-	float r, g, b;
-} vertices[ 3 ] =
-{
-	{ -0.6f, -0.4f, 1.0f, 0.f, 0.f },
-	{  0.6f, -0.4f, 0.f, 1.f, 0.f },
-	{   0.f,  0.6f, 0.f, 0.f, 1.f }
-};
+#include "renderer.h"
+
+#include "vertexBuffer.h"
+#include "indexBuffer.h"
 
 static const char* vertex_shader_text =
 "#version 110\n"
@@ -70,11 +65,26 @@ int main( void ) {
 	gladLoadGL();
 	glfwSwapInterval( 1 );
 
-	// NOTE: OpenGL error checks have been omitted for brevity
+	float vertices[] = {
+		// Positions		// Colors
+		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, // 0
+		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // 1
+		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // 2
+		-0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f  // 3
+	};
 
-	glGenBuffers( 1, &vertex_buffer );
-	glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), vertices, GL_STATIC_DRAW );
+	unsigned int indices[] = {
+		0, 1, 2,
+		2, 3, 0
+	};
+
+	unsigned int vao;
+	GLCall( glGenVertexArrays( 1, &vao ) );
+	GLCall( glBindVertexArray( vao ) );
+
+	VertexBuffer vb( vertices, sizeof( vertices ) );
+
+	IndexBuffer ib( indices, 6 );
 
 	vertex_shader = glCreateShader( GL_VERTEX_SHADER );
 	glShaderSource( vertex_shader, 1, &vertex_shader_text, NULL );
@@ -94,11 +104,10 @@ int main( void ) {
 	vcol_location = glGetAttribLocation( program, "vCol" );
 
 	glEnableVertexAttribArray( vpos_location );
-	glVertexAttribPointer( vpos_location, 2, GL_FLOAT, GL_FALSE,
-		sizeof( vertices[ 0 ] ), ( void* ) 0 );
+	glVertexAttribPointer( vpos_location, 3, GL_FLOAT, GL_FALSE, 6 * sizeof( vertices[ 0 ] ), ( void* ) 0 );
+
 	glEnableVertexAttribArray( vcol_location );
-	glVertexAttribPointer( vcol_location, 3, GL_FLOAT, GL_FALSE,
-		sizeof( vertices[ 0 ] ), ( void* ) ( sizeof( float ) * 2 ) );
+	glVertexAttribPointer( vcol_location, 3, GL_FLOAT, GL_FALSE, 6 * sizeof( vertices[ 0 ] ), ( void* ) ( sizeof( float ) * 3 ) );
 
 	while( !glfwWindowShouldClose( window ) ) {
 		float ratio;
@@ -116,9 +125,14 @@ int main( void ) {
 		p = glm::ortho( -ratio, ratio, -1.f, 1.f, 1.f, -1.f );
 		mvp = p * m;
 
-		glUseProgram( program );
-		glUniformMatrix4fv( mvp_location, 1, GL_FALSE, ( const GLfloat* ) &mvp );
-		glDrawArrays( GL_TRIANGLES, 0, 3 );
+		GLCall( glUseProgram( program ) );
+		GLCall( glUniformMatrix4fv( mvp_location, 1, GL_FALSE, ( const GLfloat* ) &mvp ) );
+
+		GLCall( glBindVertexArray( vao ) );
+		ib.bind();
+
+		GLCall( glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr ) );
+
 
 		glfwSwapBuffers( window );
 		glfwPollEvents();
