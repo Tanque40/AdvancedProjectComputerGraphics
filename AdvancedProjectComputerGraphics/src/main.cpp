@@ -49,8 +49,8 @@ int main( void ) {
 		// Positions		// Colors
 		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, // 0
 		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // 1
-		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // 2
-		-0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f  // 3
+		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, // 2
+		-0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f  // 3
 	};
 
 	unsigned int indices[] = {
@@ -59,9 +59,10 @@ int main( void ) {
 	};
 
 	VertexArray va;
-	VertexBuffer vb( vertices, 4 * 6 * sizeof( float ) );
+	VertexBuffer vb( vertices, sizeof( vertices ) );
 	VertexBufferLayout layout;
 
+	layout.push<float>( 3 );
 	layout.push<float>( 3 );
 	va.addBuffer( vb, layout );
 	va.bind();
@@ -73,20 +74,22 @@ int main( void ) {
 	while( !glfwWindowShouldClose( window ) ) {
 		float ratio;
 		int width, height;
-		glm::mat4x4 p, mvp;
+		glm::mat4x4 projection, model, view;
 
 		glfwGetFramebufferSize( window, &width, &height );
 		ratio = width / ( float ) height;
 
 		glViewport( 0, 0, width, height );
+		glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
 		glClear( GL_COLOR_BUFFER_BIT );
 
 		glm::mat4 m( 1.0f );
-		m = glm::rotate( m, ( float ) glfwGetTime(), glm::vec3( 1.f ) );
-		p = glm::ortho( -ratio, ratio, -1.f, 1.f, 1.f, -1.f );
-		mvp = p * m;
+		model = glm::rotate( m, ( float ) glfwGetTime(), glm::vec3( 1.f ) );
+		projection = glm::ortho( -ratio, ratio, -1.f, 1.f, 1.f, -1.f );
+
 
 		mainShader.bind();
+		mainShader.SetuniformsMat4f( "model", model );
 		va.bind();
 		ib.bind();
 

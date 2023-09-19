@@ -33,6 +33,10 @@ void Shader::setUniform4f( const std::string& name, glm::vec4  vector ) {
 	GLCall( glUniform4fv( getUniformLocation( name ), 1, &vector[ 0 ] ) );
 }
 
+void Shader::SetuniformsMat4f( const std::string& name, const glm::mat4& mat4 ) {
+	GLCall( glUniformMatrix4fv( getUniformLocation( name ), 1, GL_FALSE, &mat4[ 0 ][ 0 ] ) );
+}
+
 /////// Uniforms
 
 std::string Shader::parseShader( const std::string& filepath ) {
@@ -60,7 +64,7 @@ unsigned int Shader::compileShader( unsigned int type, const std::string& source
 		GLCall( glGetShaderiv( id, GL_INFO_LOG_LENGTH, &length ) );
 		char* message = ( char* ) malloc( length * sizeof( char ) );
 		GLCall( glGetShaderInfoLog( id, length, &length, message ) );
-		std::cout << "Failed to compile Shader" << ( type == GL_VERTEX_SHADER ? "vertex" : "fragment" ) << std::endl;
+		std::cout << "Failed to compile Shader" << ( type == GL_VERTEX_SHADER ? "vertex" : type == GL_FRAGMENT_SHADER ? "fragment" : "geometry" ) << std::endl;
 		std::cout << message << std::endl;
 		GLCall( glDeleteShader( id ) );
 		return 0;
@@ -91,22 +95,18 @@ unsigned int Shader::createShader( const std::string& vertexShader, const std::s
 	unsigned int program = glCreateProgram();
 	unsigned int vs = compileShader( GL_VERTEX_SHADER, vertexShader );
 	unsigned int fs = compileShader( GL_FRAGMENT_SHADER, fragmentShader );
-	unsigned int gs = 0;
-	if( geometryShader.size() != 0 )
-		gs = compileShader( GL_GEOMETRY_SHADER, geometryShader );
+	unsigned int gs = compileShader( GL_GEOMETRY_SHADER, geometryShader );
 
 	GLCall( glAttachShader( program, vs ) );
 	GLCall( glAttachShader( program, fs ) );
-	if( geometryShader.size() != 0 )
-		GLCall( glAttachShader( program, gs ) );
+	GLCall( glAttachShader( program, gs ) );
 
 	GLCall( glLinkProgram( program ) );
 	GLCall( glValidateProgram( program ) );
 
 	GLCall( glDeleteShader( vs ) );
 	GLCall( glDeleteShader( fs ) );
-	if( geometryShader.size() != 0 )
-		GLCall( glDeleteShader( gs ) );
+	GLCall( glDeleteShader( gs ) );
 
 	return program;
 }

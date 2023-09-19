@@ -28,6 +28,7 @@ public:
 
 	// set uniforms
 	void setUniform4f( const std::string& name, glm::vec4 vector );
+	void SetuniformsMat4f( const std::string& name, const glm::mat4& mat4 );
 
 private:
 	std::string parseShader( const std::string& filepath );
