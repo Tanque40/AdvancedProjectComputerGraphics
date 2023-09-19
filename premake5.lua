@@ -32,7 +32,10 @@ files {
 	"%{prj.name}/src/**.h",
 	"%{prj.name}/src/**.cpp",
 	"%{prj.name}/res/**/**.png",
-	"%{prj.name}/res/**/**.glsl"
+	"%{prj.name}/res/**/**.glsl",
+	"%{prj.name}/res/**/**.vs",
+	"%{prj.name}/res/**/**.fs",
+	"%{prj.name}/res/**/**.gs",
 }
 
 defines {
