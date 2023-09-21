@@ -44,6 +44,7 @@ defines {
 
 includedirs {
 	"%{prj.name}/src",
+	"%{prj.name}/src/vendor",
 	"%{includeDir.GLFW}",
 	"%{includeDir.Glad}",
 	"%{includeDir.glm}",

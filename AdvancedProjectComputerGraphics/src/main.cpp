@@ -9,9 +9,11 @@
 #include "Renderer.h"
 
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 
 static void error_callback( int error, const char* description ) {
 	fprintf( stderr, "Error: %s\n", description );
@@ -47,10 +49,10 @@ int main( void ) {
 
 	float vertices[] = {
 		// Positions		// Colors
-		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, // 0
-		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // 1
-		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, // 2
-		-0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f  // 3
+		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // 0
+		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // 1
+		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // 2
+		-0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f // 3
 	};
 
 	unsigned int indices[] = {
@@ -58,18 +60,31 @@ int main( void ) {
 		2, 3, 0
 	};
 
+	GLCall( glEnable( GL_BLEND ) );
+	GLCall( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
+
 	VertexArray va;
 	VertexBuffer vb( vertices, sizeof( vertices ) );
 	VertexBufferLayout layout;
 
 	layout.push<float>( 3 );
 	layout.push<float>( 3 );
+	layout.push<float>( 2 );
 	va.addBuffer( vb, layout );
 	va.bind();
 
 	IndexBuffer ib( indices, 6 );
 
 	Shader mainShader( "res/shaders/template.vs", "res/shaders/template.fs" );
+
+	Texture texture1( "res/textures/nether_brick.png" );
+	GLuint texture1Id = texture1.getRendererId();
+	glActiveTexture( GL_TEXTURE0 );
+	GLCall( glBindTextureUnit( 1, texture1Id ) );
+
+	Renderer renderer;
+
+	glPolygonMode( GL_FRONT, GL_FILL );
 
 	while( !glfwWindowShouldClose( window ) ) {
 		float ratio;
@@ -80,8 +95,8 @@ int main( void ) {
 		ratio = width / ( float ) height;
 
 		glViewport( 0, 0, width, height );
-		glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
-		glClear( GL_COLOR_BUFFER_BIT );
+
+		renderer.clear();
 
 		glm::mat4 m( 1.0f );
 		model = glm::rotate( m, ( float ) glfwGetTime(), glm::vec3( 1.f ) );
@@ -90,10 +105,8 @@ int main( void ) {
 
 		mainShader.bind();
 		mainShader.SetuniformsMat4f( "model", model );
-		va.bind();
-		ib.bind();
 
-		GLCall( glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr ) );
+		renderer.draw( va, ib, mainShader );
 
 
 		glfwSwapBuffers( window );
