@@ -29,6 +29,11 @@ void Shader::unBind() const {
 }
 
 /////// Uniforms
+
+void Shader::setUniform1i( const std::string& name, int value ) {
+	GLCall( glUniform1i( getUniformLocation( name ), value ) );
+}
+
 void Shader::setUniform4f( const std::string& name, glm::vec4  vector ) {
 	GLCall( glUniform4fv( getUniformLocation( name ), 1, &vector[ 0 ] ) );
 }
@@ -111,7 +116,7 @@ unsigned int Shader::createShader( const std::string& vertexShader, const std::s
 	return program;
 }
 
-unsigned int Shader::getUniformLocation( const std::string& name ) {
+int Shader::getUniformLocation( const std::string& name ) {
 	if( uniformLocationCache.find( name ) != uniformLocationCache.end() )
 		return uniformLocationCache[ name ];
 

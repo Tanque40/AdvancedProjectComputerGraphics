@@ -52,12 +52,20 @@ int main( void ) {
 		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // 0
 		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // 1
 		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // 2
-		-0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f // 3
+		-0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // 3
+
+		 0.1f,  0.6f, -0.2f,  1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // 4
+		 0.1f, -0.6f, -0.2f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // 5
+		-0.1f, -0.6f, -0.2f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // 6
+		-0.1f,  0.6f, -0.2f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // 7
 	};
 
 	unsigned int indices[] = {
 		0, 1, 2,
-		2, 3, 0
+		2, 3, 0,
+
+		4, 5, 6,
+		6, 7, 4
 	};
 
 	GLCall( glEnable( GL_BLEND ) );
@@ -73,14 +81,13 @@ int main( void ) {
 	va.addBuffer( vb, layout );
 	va.bind();
 
-	IndexBuffer ib( indices, 6 );
+	IndexBuffer ib( indices, sizeof( indices ) );
 
 	Shader mainShader( "res/shaders/template.vs", "res/shaders/template.fs" );
 
 	Texture texture1( "res/textures/nether_brick.png" );
-	GLuint texture1Id = texture1.getRendererId();
-	glActiveTexture( GL_TEXTURE0 );
-	GLCall( glBindTextureUnit( 1, texture1Id ) );
+	texture1.bind( 0 );
+
 
 	Renderer renderer;
 
@@ -105,6 +112,7 @@ int main( void ) {
 
 		mainShader.bind();
 		mainShader.SetuniformsMat4f( "model", model );
+		mainShader.setUniform1i( "ourTexture", 0 );
 
 		renderer.draw( va, ib, mainShader );
 

@@ -27,6 +27,7 @@ public:
 	void unBind() const;
 
 	// set uniforms
+	void setUniform1i( const std::string& name, int value );
 	void setUniform4f( const std::string& name, glm::vec4 vector );
 	void SetuniformsMat4f( const std::string& name, const glm::mat4& mat4 );
 
@@ -35,5 +36,5 @@ private:
 	unsigned int compileShader( unsigned int type, const std::string& source );
 	unsigned int createShader( const std::string& vertexShader, const std::string& fragmentShader );
 	unsigned int createShader( const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader );
-	unsigned int getUniformLocation( const std::string& name );
+	int getUniformLocation( const std::string& name );
 };

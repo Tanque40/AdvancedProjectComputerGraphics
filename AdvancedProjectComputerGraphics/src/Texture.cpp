@@ -16,8 +16,8 @@ Texture::Texture( const std::string& path ) : filePath( path ), localBuffer( nul
 	GLCall( glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE ) );
 
 	if( localBuffer ) {
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, localBuffer );
-		glGenerateMipmap( GL_TEXTURE_2D );
+		GLCall( glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, localBuffer ) );
+		GLCall( glBindTexture( GL_TEXTURE_2D, 0 ) );
 		stbi_image_free( localBuffer );
 	} else {
 		std::cout << "\nError: Failed to load texture" << std::endl;
@@ -35,6 +35,7 @@ GLuint Texture::getRendererId() {
 }
 
 void Texture::bind( unsigned int slot ) const {
+	glActiveTexture( GL_TEXTURE0 + slot );
 	GLCall( glBindTexture( GL_TEXTURE_2D, rendererId ) );
 }
 
