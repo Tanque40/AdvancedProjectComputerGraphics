@@ -48,16 +48,16 @@ int main( void ) {
 	glfwSwapInterval( 1 );
 
 	float vertices[] = {
-		// Positions		// Colors
-		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // 0
-		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // 1
-		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // 2
-		-0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // 3
+		// Positions		// Colors			// Texture Coords
+		 0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // 0
+		 0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // 1
+		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // 2
+		-0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, // 3
 
-		 0.1f,  0.6f, -0.2f,  1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // 4
-		 0.1f, -0.6f, -0.2f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // 5
-		-0.1f, -0.6f, -0.2f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // 6
-		-0.1f,  0.6f, -0.2f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f  // 7
+		 0.1f,  0.6f, -0.2f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // 4
+		 0.1f, -0.6f, -0.2f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // 5
+		-0.1f, -0.6f, -0.2f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // 6
+		-0.1f,  0.6f, -0.2f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f  // 7
 	};
 
 	unsigned int indices[] = {
@@ -68,6 +68,7 @@ int main( void ) {
 		6, 7, 4
 	};
 
+	// How OpenGL will work with the format of textures
 	GLCall( glEnable( GL_BLEND ) );
 	GLCall( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
 
@@ -75,6 +76,9 @@ int main( void ) {
 	VertexBuffer vb( vertices, sizeof( vertices ) );
 	VertexBufferLayout layout;
 
+	// Add a push per every layer that you add to VertexBuffer, the param is de number of
+	// positions that use your layer
+	// Each layer represents a level, can be a coordinate, color or texture
 	layout.push<float>( 3 );
 	layout.push<float>( 3 );
 	layout.push<float>( 2 );
@@ -85,7 +89,9 @@ int main( void ) {
 
 	Shader mainShader( "res/shaders/template.vs", "res/shaders/template.fs" );
 
+	// Just write the direction of your Texture
 	Texture texture1( "res/textures/nether_brick.png" );
+	// If you add more than 1 texture, need to add + 1 in the param per each bind call
 	texture1.bind( 0 );
 
 
